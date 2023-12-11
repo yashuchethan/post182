@@ -1,0 +1,103 @@
+Perform CRUD Operations on MongoDB through REST API using Spring Boot Starter Data MongoDB
+
+Step 1: Create a Spring Boot project. 
+Step 2: Add the following dependency
+•	Spring Web
+•	MongoDB
+•	Lombok
+•	DevTools
+
+Step 3: Create 3 packages and create some classes and interfaces inside these packages
+•	entity
+•	repository
+•	controller
+Step 4: Inside the entity package create a Book.java file.
+package com.example.security.entity;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Document(collection = "Book")
+public class Book {
+	@Id 
+	private int id;
+	private String bookName;
+	private String authorName;
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getBookName() {
+		return bookName;
+	}
+	public void setBookName(String bookName) {
+		this.bookName = bookName;
+	}
+	public String getAuthorName() {
+		return authorName;
+	}
+	public void setAuthorName(String authorName) {
+		this.authorName = authorName;
+	}
+	
+}
+
+Step 5: Inside the repository package
+Create a simple interface and name the interface as BookRepo. This interface is going to extend the MongoRepository
+
+package com.example.security.repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import com.example.security.entity.Book;
+public interface BookRepo
+	extends MongoRepository<Book, Integer> {
+}
+
+Step 6: Inside the controller package. Inside the package create one class named as BookController
+
+package com.example.security.controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import com.example.security.entity.Book;
+import com.example.security.repository.BookRepo;
+import java.util.List;
+@RestController
+public class BookController {
+	@Autowired
+	private BookRepo repo;
+	
+@PostMapping("/addBook")
+	public String saveBook(@RequestBody Book book){
+		repo.save(book);
+		return "Added Successfully";
+	}
+@GetMapping("/findAllBooks")
+	public List<Book> getBooks() {
+		return repo.findAll();
+	}
+@DeleteMapping("/delete/{id}")
+	public String deleteBook(@PathVariable int id){
+		repo.deleteById(id);
+		return "Deleted Successfully";
+	}
+}
+Step 7: Below is the code for the application.properties file
+
+server.port:8989
+spring.data.mongodb.host=localhost
+spring.data.mongodb.port=27017
+spring.data.mongodb.database=jss
+
+Step 8: Inside the MongoDB Compass
+Go to your MongoDB Compass and create a Database named BookStore and inside the database create a collection named Book
+
+Testing the Endpoint in Postman
+POST – http://localhost:8989/addBook
+GET – http://localhost:8989/findAllBooks
+DELETE – http://localhost:8989/delete/1
+
